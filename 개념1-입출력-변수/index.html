@@ -716,7 +716,8 @@ AI Creative Lab`,
           }
 
           if (usePromptRealInput) {
-            const value = window.prompt(promptText || '입력하세요', promptInputs[inputIndex] || '');
+            // 정답이 미리 채워지지 않도록 두 번째 인자를 빈 문자열('')로 변경했습니다.
+            const value = window.prompt(promptText || '입력하세요', '');
             inputIndex += 1;
             return Promise.resolve(value === null ? '' : value);
           } else {
