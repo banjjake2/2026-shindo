@@ -319,7 +319,7 @@
       </div>
 
       <div class="hint" id="sidebarTipBox"></div>
-      <div class="mini">2026년 신도고 1학년 정보수업</div>
+      <div class="mini">2026년 Python 수업</div>
     </aside>
 
     <main class="main">
@@ -825,14 +825,45 @@ AI Creative Lab`,
         return;
       }
 
-      const url =
-        CONFIG.formBaseUrl +
-        '?' + CONFIG.entryClassroom + '=' + encodeURIComponent(classroom) +
-        '&' + CONFIG.entryStudentNumber + '=' + encodeURIComponent(studentNumber) +
-        '&' + CONFIG.entryCode + '=' + encodeURIComponent(code) +
-        '&' + CONFIG.entryResult + '=' + encodeURIComponent(result);
+      // 페이지 이동을 막고 백그라운드 전송을 위한 숨겨진 iframe 생성 (복원됨)
+      let iframe = document.getElementById('hidden_iframe');
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.name = 'hidden_iframe';
+        iframe.id = 'hidden_iframe';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+        
+        // 전송 완료 시 실행될 알림
+        iframe.onload = function() {
+          alert('✅ 과제 제출이 완료되었습니다! (스프레드시트 전송 완료)');
+        };
+      }
 
-      window.location.href = url;
+      // 동적 폼 생성 및 iframe을 타겟으로 전송
+      const form = document.createElement('form');
+      form.action = CONFIG.formBaseUrl;
+      form.method = 'POST';
+      form.target = 'hidden_iframe';
+
+      const inputs = [
+        { name: CONFIG.entryClassroom, value: classroom },
+        { name: CONFIG.entryStudentNumber, value: studentNumber },
+        { name: CONFIG.entryCode, value: code },
+        { name: CONFIG.entryResult, value: result }
+      ];
+
+      inputs.forEach(item => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = item.name;
+        input.value = item.value;
+        form.appendChild(input);
+      });
+
+      document.body.appendChild(form);
+      form.submit();
+      document.body.removeChild(form);
     }
 
     function initPage() {
