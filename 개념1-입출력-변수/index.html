@@ -319,7 +319,7 @@
       </div>
 
       <div class="hint" id="sidebarTipBox"></div>
-      <div class="mini">2026년 신도고 </div>
+      <div class="mini">2026년 신도고 수업</div>
     </aside>
 
     <main class="main">
@@ -537,14 +537,16 @@ AI Creative Lab`,
       ],
 
       classOptions: ["1","2","3","4","5","6","7","8","9","10"],
-      numberOptions: ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27"],
+      numberOptions: ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29"],
 
-      /* ✅ 요청하신 최신 구글 폼 주소 및 entry 번호 유지 */
       formBaseUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSe8cxQJ9GRWPLCs2BGPMe57oHtxJq-dubCAyk8RHwsuiKoQOQ/formResponse',
       entryClassroom: 'entry.1111024106',
       entryStudentNumber: 'entry.2049503448',
       entryCode: 'entry.575810491',
-      entryResult: 'entry.1971612230'
+      entryResult: 'entry.1971612230',
+      
+      // 🌟 새로 추가하신 '과제 제목' 항목의 entry 번호 적용 완료!
+      entryTaskTitle: 'entry.474943518' 
     };
 
     let activeLessonIndex = 0;
@@ -716,7 +718,6 @@ AI Creative Lab`,
           }
 
           if (usePromptRealInput) {
-            // 정답이 미리 채워지지 않도록 두 번째 인자를 빈 문자열('')로 변경했습니다.
             const value = window.prompt(promptText || '입력하세요', '');
             inputIndex += 1;
             return Promise.resolve(value === null ? '' : value);
@@ -815,6 +816,9 @@ AI Creative Lab`,
       const code = document.getElementById(`code-${index}`).value;
       const result = latestCheckResults[index];
 
+      // 🌟 페이지의 제목(pageTitle)을 과제 제목으로 자동 추출
+      const taskTitle = CONFIG.pageTitle;
+
       if (!classroom || !studentNumber) {
         alert('반과 번호를 모두 선택하세요.');
         return;
@@ -825,7 +829,6 @@ AI Creative Lab`,
         return;
       }
 
-      // 페이지 이동을 막고 백그라운드 전송을 위한 숨겨진 iframe 생성 (복원됨)
       let iframe = document.getElementById('hidden_iframe');
       if (!iframe) {
         iframe = document.createElement('iframe');
@@ -834,31 +837,34 @@ AI Creative Lab`,
         iframe.style.display = 'none';
         document.body.appendChild(iframe);
         
-        // 전송 완료 시 실행될 알림
         iframe.onload = function() {
           alert('✅ 과제 제출이 완료되었습니다!');
         };
       }
 
-      // 동적 폼 생성 및 iframe을 타겟으로 전송
       const form = document.createElement('form');
       form.action = CONFIG.formBaseUrl;
       form.method = 'POST';
       form.target = 'hidden_iframe';
 
+      // 🌟 폼 데이터에 과제 제목 추가
       const inputs = [
         { name: CONFIG.entryClassroom, value: classroom },
         { name: CONFIG.entryStudentNumber, value: studentNumber },
         { name: CONFIG.entryCode, value: code },
-        { name: CONFIG.entryResult, value: result }
+        { name: CONFIG.entryResult, value: result },
+        { name: CONFIG.entryTaskTitle, value: taskTitle } // 과제 제목 추가
       ];
 
       inputs.forEach(item => {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = item.name;
-        input.value = item.value;
-        form.appendChild(input);
+        // 설정되지 않은 entry는 무시 (오류 방지)
+        if (item.name && item.name !== 'entry.000000000') {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = item.name;
+          input.value = item.value;
+          form.appendChild(input);
+        }
       });
 
       document.body.appendChild(form);
